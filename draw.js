@@ -10,7 +10,6 @@ AWS.config.update({region: 'sa-east-1'});
 // Create an SQS service object
 var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 
-
 const total=50;
 
 String.prototype.lpad = function(padString, length) {
@@ -55,36 +54,34 @@ async function receiverRoutine(event, context) {
                 ReceiptHandle: message.ReceiptHandle
               };
             result =  message.MessageAttributes["drawCount"]["StringValue"]+"@"+
-            message.MessageAttributes["color"]["StringValue"];
+            message.MessageAttributes["color"]["StringValue"]+"@"+
+            message.MessageAttributes["length"]["StringValue"];
             await sqs.deleteMessage(deleteParams).promise();
         }
         
-
         return result;
-        console.log(body);
-
-        
 
     }
     catch(err){
         return 0;
-        console.log(err);
-        body = err;
     }
-
-    const response = {
-        statusCode: 200,
-        body: JSON.stringify(body),
-    };
-    
-    return 0;
 
 }
 
-const fator = 5;
+async function print(total, color, length){
+    let token="";
+    for (let i=0; i<length; i++)
+        token+="█";
+
+    for(let i=0; i<total; i++) {
+        eval("console.log(token."+color+");");
+        await delay(80);
+    }  
+}
+
 async function init(){
     while (true){
-        await delay(1000);        
+        await delay(1500);        
         
         let result = await receiverRoutine();
         
@@ -93,17 +90,10 @@ async function init(){
 
         let total = result.split("@")[0];
         let color = result.split("@")[1];
-
-        for (let i=2; i<30; i++){   
-            for (let j=1; j<=total; j++){
-                //eval("console.log("█\".color);");
-                eval("console.log(\"█\".lpad(' ', i)."+color+");");
-                //console.log("█".lpad(' ', i).green);
-            }
-            
-            await delay(80);
-            console.clear();   
-        }
+        let length = result.split("@")[2];
+              
+        print(total, color, length);
+        
     }
 }
 

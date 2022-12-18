@@ -7,7 +7,9 @@
     "colors": "^1.4.0",
     "dotenv": "^16.0.3",
     "gm": "^1.25.0",
+    "play-sound": "^1.1.5",
     "plotly": "^1.0.6",
-    "terminal-canvas": "^3.1.2"
+    "terminal-canvas": "^3.1.2",
+    "tone": "^14.7.77"
   }
 }

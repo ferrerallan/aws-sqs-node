@@ -1,4 +1,3 @@
-const axios = require('axios');
 var colors = require('colors');
 require('dotenv').config();
 
@@ -9,8 +8,9 @@ AWS.config.update({region: 'sa-east-1'});
 
 // Create an SQS service object
 var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
-async function send(total, color) {
+async function send(total, color, length) {
     const s = total.toString();
+    const l = length.toString();
     var params = {
         // Remove DelaySeconds parameter and value for FIFO queues
         DelaySeconds: 10,
@@ -19,12 +19,16 @@ async function send(total, color) {
                 DataType: "Number",
                 StringValue: s
             },
+            "length": {
+                DataType: "Number",
+                StringValue: l
+            },
             "color": {
                 DataType: "String",
                 StringValue: color
             }
         },        
-        MessageBody: "{ \"message\": \"Hello Guitar!\"}",
+        MessageBody: "{ \"message\": \"Hello Sound!\"}",
 
         QueueUrl: process.env.QUEUE_URL
     };
@@ -47,29 +51,25 @@ async function send(total, color) {
     return response;
 }
 
-
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
+
 function delay(milliseconds){
     return new Promise(resolve => {
         setTimeout(resolve, milliseconds);
     });
 }
 
-
-
 async function init(){
-    const lista = ["green","red","blue","rainbow","yellow"];
+    const lista = ["green","red","blue","white","yellow"];
     while (true) {
         const total = getRndInteger(1, 50);
         const totalColor = getRndInteger(0, 4);
-        //eval('console.log("hello".rainbow)');
-        //console.log('hello'.rainbow);
         console.log("to generate: " + total);
         console.log("color: " + lista[totalColor]);
-        send(total, lista[totalColor]);
-        await delay(2000);
+        send(total, lista[totalColor], getRndInteger(1, 50));
+        await delay(1000);
     }
 }
 
